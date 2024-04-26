@@ -11,18 +11,21 @@ AddEventHandler('onResourceStop', function(name)
 end)
 
 RegisterNetEvent("resource_name:isAdmin")
-AddEventHandler("resource_name:isAdmin", function(modelName)
+AddEventHandler("resource_name:isAdmin", function(eventName, args)
+    -- Check if player is admin
     local _source = source
-    local Character = Core.getUser(_source).getUsedCharacter
     local User = Core.getUser(_source)
-    local group = Character.group
+    local Character = User.getUsedCharacter
+    local player_group = Character.group
     local group1 = User.getGroup
-
-    -- Check if the player has the 'admin' permission
-    if IsPlayerAceAllowed(_source, "admin") or group == "admin" or group1 == "admin" then
-        -- Player is admin - run client side command
-        TriggerClientEvent("resource_name:clientEvent", _source, modelName)
-        
+    local ace_allowed = IsPlayerAceAllowed(_source, "admin")
+    if ace_allowed or player_group == "admin" or group1 == "admin" then
+    -- if player is admin, it triggers client event with given args and eventName for _source
+        if args ~= nil then -- FIXME: user must pass at least an empty table {} for args
+            TriggerClientEvent(eventName, _source, table.unpack(args));
+        else
+            TriggerClientEvent(eventName, _source);
+        end
     end
 end)
 
